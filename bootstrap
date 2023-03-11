@@ -6,4 +6,5 @@ pyvendir="$(dirname "$0")"
 
 python="$(which python3 || which python)"
 
+# FIXME: venvpool.py has moved.
 exec "$python" "$pyvendir"/venvpool.py "$pyvendir"/pyven/initscripts.py -- "$@"
