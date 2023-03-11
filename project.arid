@@ -31,11 +31,9 @@ requires +=
     lagoon>=24
     setuptools>=44.1.1
     twine>=1.15.0
+    venvpool
 pyversions +=
     3
     2
 executable = true
 buildbot enabled = true
-upstream devel packages +=
-    lsof
-    virtualenv

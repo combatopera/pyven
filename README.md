@@ -37,9 +37,6 @@ venvname/bin/pip install -e pyven
 
 ## Commands
 
-### compactpool
-Use jdupes to combine identical files in the venv pool.
-
 ### drmake
 Build a Docker image with automatic tag.
 
