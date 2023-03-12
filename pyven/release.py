@@ -138,7 +138,7 @@ def _warmups(info):
 
 def _runsetup(info, commands):
     with Pool(next(iter(info.config.pyversions))).readonly(SimpleInstallDeps(allbuildrequires(info))) as venv:
-        venv.run('check_call', [], 'setup', commands, cwd = info.projectdir)
+        venv.run('check_call', ['.'], 'setup', commands, cwd = info.projectdir) # XXX: Should venvpool automatically include current dir?
 
 def release(config, srcgit, info):
     scrub = lagoon.git.clean._xdi[partial](cwd = info.projectdir, input = 'c', stdout = None)
