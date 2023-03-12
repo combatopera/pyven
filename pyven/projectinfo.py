@@ -22,7 +22,7 @@ from .util import Path
 from aridity.config import ConfigCtrl
 from aridity.util import openresource
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
-from venvpool import BaseReq
+from venvpool import BaseReq, executablebits
 import logging, os, re, stat, subprocess
 
 log = logging.getLogger(__name__)
@@ -172,9 +172,8 @@ class ProjectInfo:
     def scripts(self):
         if not self.config.executable:
             return []
-        xmask = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
         def isscript(path):
-            return os.stat(path).st_mode & xmask and not os.path.isdir(path)
+            return os.stat(path).st_mode & executablebits and not os.path.isdir(path)
         return [name for name in os.listdir(self.projectdir) if isscript(os.path.join(self.projectdir, name))]
 
     def mainmodules(self):

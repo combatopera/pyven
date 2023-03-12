@@ -23,8 +23,6 @@ from venvpool import scan, scriptregex
 import logging, os, re, sys, venvpool
 
 log = logging.getLogger(__name__)
-executablebits = S_IXUSR | S_IXGRP | S_IXOTH
-scriptpattern = re.compile(scriptregex, re.MULTILINE)
 userbin = os.path.join(os.path.expanduser('~'), '.local', 'bin')
 
 def _projectinfos():
