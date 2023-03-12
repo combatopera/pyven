@@ -23,7 +23,7 @@ from aridity.config import ConfigCtrl
 from aridity.util import openresource
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
 from venvpool import BaseReq, executablebits
-import logging, os, re, subprocess
+import logging, os, re, subprocess, venvpool
 
 log = logging.getLogger(__name__)
 
@@ -181,8 +181,7 @@ class ProjectInfo:
         scriptpath = mainmodules.__file__
         if 'c' == scriptpath[-1]:
             scriptpath = scriptpath[:-1]
-        # FIXME: Make venvpool available to it.
-        for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), scriptpath, self.projectdir] + paths).splitlines():
+        for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), venvpool.__file__, '-l', '--', scriptpath, self.projectdir] + paths).splitlines():
             yield MainModule(eval(line))
 
     def console_scripts(self):
