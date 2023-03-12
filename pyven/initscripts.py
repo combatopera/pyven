@@ -44,15 +44,6 @@ def _projectinfos():
                 else:
                     yield setuptoolsinfo(setuppath)
 
-def _srcpaths(rootdir):
-    for dirpath, dirnames, filenames in os.walk(rootdir):
-        for name in filenames:
-            if name.endswith(dotpy):
-                path = os.path.join(dirpath, name)
-                with open(path) as f:
-                    if scriptpattern.search(f.read()) is not None:
-                        yield path
-
 def main():
     venvpool.initlogging()
     for info in _projectinfos():
