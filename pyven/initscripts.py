@@ -18,11 +18,10 @@
 from .projectinfo import ProjectInfo
 from .setuproot import setuptoolsinfo
 from aridity.config import ConfigCtrl
-from venvpool import scan
+from venvpool import initlogging, scan, userbin
 import logging, os, sys, venvpool
 
 log = logging.getLogger(__name__)
-userbin = os.path.join(os.path.expanduser('~'), '.local', 'bin')
 
 def _projectinfos():
     cc = ConfigCtrl()
@@ -41,7 +40,7 @@ def _projectinfos():
                     yield setuptoolsinfo(setuppath)
 
 def main():
-    venvpool.initlogging()
+    initlogging()
     for info in _projectinfos():
         if not hasattr(info.config, 'name'):
             log.debug("Skip: %s", info.projectdir)
