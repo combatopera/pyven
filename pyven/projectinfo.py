@@ -182,6 +182,7 @@ class ProjectInfo:
         scriptpath = mainmodules.__file__
         if 'c' == scriptpath[-1]:
             scriptpath = scriptpath[:-1]
+        # FIXME: Make venvpool available to it.
         for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), scriptpath, self.projectdir] + paths).splitlines():
             yield MainModule(eval(line))
 
