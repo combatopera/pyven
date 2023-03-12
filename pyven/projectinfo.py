@@ -23,7 +23,7 @@ from aridity.config import ConfigCtrl
 from aridity.util import openresource
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
 from venvpool import BaseReq, executablebits
-import logging, os, re, stat, subprocess
+import logging, os, re, subprocess
 
 log = logging.getLogger(__name__)
 

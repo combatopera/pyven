@@ -18,9 +18,8 @@
 from .projectinfo import ProjectInfo
 from .setuproot import setuptoolsinfo
 from aridity.config import ConfigCtrl
-from stat import S_IXUSR, S_IXGRP, S_IXOTH
-from venvpool import scan, scriptregex
-import logging, os, re, sys, venvpool
+from venvpool import scan
+import logging, os, sys, venvpool
 
 log = logging.getLogger(__name__)
 userbin = os.path.join(os.path.expanduser('~'), '.local', 'bin')
