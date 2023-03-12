@@ -20,7 +20,7 @@ from .setuproot import setuptoolsinfo
 from aridity.config import ConfigCtrl
 from aridity.util import dotpy
 from stat import S_IXUSR, S_IXGRP, S_IXOTH
-from venvpool import checkpath, commandornone, scriptregex
+from venvpool import scan, scriptregex
 import logging, os, re, sys, venvpool
 
 log = logging.getLogger(__name__)
@@ -64,27 +64,6 @@ def main():
             continue
         log.info("Scan: %s", info.projectdir)
         scan(info.projectdir, userbin, max(info.config.pyversions), venvpool.__file__)
-
-def scan(projectdir, bindir, pyversion, venvpoolpath):
-    for srcpath in _srcpaths(projectdir):
-        if not checkpath(projectdir, srcpath):
-            log.debug("Not a project source file: %s", srcpath)
-            continue
-        command = commandornone(srcpath)
-        if command is None:
-            log.debug("Bad source name: %s", srcpath)
-            continue
-        scriptpath = os.path.join(bindir, command)
-        with open(scriptpath, 'w') as f:
-            f.write("""#!/usr/bin/env python{pyversion}
-import sys
-sys.argv[1:1] = '-l', '--', {srcpath!r}
-__file__ = {venvpoolpath!r}
-with open(__file__) as f: text = f.read()
-del sys, f
-exec('del text\\n' + text)
-""".format(**locals()))
-        os.chmod(scriptpath, os.stat(scriptpath).st_mode | executablebits)
 
 if ('__main__' == __name__):
     main()
