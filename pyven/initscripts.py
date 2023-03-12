@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with pyven.  If not, see <http://www.gnu.org/licenses/>.
 
-from .mainmodules import checkpath, commandornone, scriptregex
 from .projectinfo import ProjectInfo
 from .setuproot import setuptoolsinfo
 from aridity.config import ConfigCtrl
 from aridity.util import dotpy
 from stat import S_IXUSR, S_IXGRP, S_IXOTH
+from venvpool import checkpath, commandornone, scriptregex
 import logging, os, re, sys, venvpool
 
 log = logging.getLogger(__name__)

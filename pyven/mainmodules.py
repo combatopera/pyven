@@ -15,25 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with pyven.  If not, see <http://www.gnu.org/licenses/>.
 
+from venvpool import checkpath, commandornone, dotpy as extension, scriptregex
 import ast, logging, os, re, sys
 
 log = logging.getLogger(__name__)
-extension = '.py'
-scriptregex, = (r"^if\s+(?:__name__\s*==\s*{main}|{main}\s*==\s*__name__)\s*:\s*$".format(**locals()) for main in ['''(?:'__main__'|"__main__")'''])
-
-def checkpath(projectdir, path):
-    while True:
-        path = os.path.dirname(path)
-        if path == projectdir:
-            return True
-        if not os.path.exists(os.path.join(path, '__init__.py')):
-            break
-
-def commandornone(srcpath):
-    name = os.path.basename(srcpath)
-    name = os.path.basename(os.path.dirname(srcpath)) if '__init__.py' == name else name[:-len(extension)]
-    if '-' not in name:
-        return name.replace('_', '-')
 
 def _lastiflineno(text):
     for i, l in reversed(list(enumerate(text.splitlines()))):
