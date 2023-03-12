@@ -18,7 +18,6 @@
 from .projectinfo import ProjectInfo
 from .setuproot import setuptoolsinfo
 from aridity.config import ConfigCtrl
-from aridity.util import dotpy
 from stat import S_IXUSR, S_IXGRP, S_IXOTH
 from venvpool import scan, scriptregex
 import logging, os, re, sys, venvpool
