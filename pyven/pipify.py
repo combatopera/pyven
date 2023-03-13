@@ -76,7 +76,7 @@ def main():
     parser = ArgumentParser()
     parser.add_argument('--transient', action = 'store_true')
     parser.add_argument('--version')
-    parser.add_argument('projectdir', nargs = '?')
+    parser.add_argument('projectdir', nargs = '?') # FIXME: When projectdir is passed in its console_scripts are not populated!
     args = parser.parse_args()
     info = ProjectInfo.seek('.') if args.projectdir is None else ProjectInfo(args.projectdir, os.path.join(args.projectdir, ProjectInfo.projectaridname))
     pipify(info, args.version)
