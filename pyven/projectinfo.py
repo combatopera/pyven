@@ -21,8 +21,9 @@ from .setuproot import setuptoolsinfo
 from .util import Path
 from aridity.config import ConfigCtrl
 from aridity.util import openresource
+from inspect import getsource
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
-from venvpool import BaseReq, executablebits
+from venvpool import BaseReq, executablebits, TemporaryDirectory
 import logging, os, re, subprocess, venvpool
 
 log = logging.getLogger(__name__)
@@ -178,11 +179,14 @@ class ProjectInfo:
 
     def mainmodules(self):
         paths = list(Files.relpaths(self.projectdir, [mainmodules.extension], []))
-        scriptpath = mainmodules.__file__
-        if 'c' == scriptpath[-1]:
-            scriptpath = scriptpath[:-1]
-        for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), venvpool.__file__, '-l', '--', scriptpath, self.projectdir] + paths).splitlines():
-            yield MainModule(eval(line))
+        with TemporaryDirectory() as tempdir:
+            scriptpath = os.path.join(tempdir, 'mainmodules.py')
+            with open(scriptpath, 'w') as f:
+                f.write(getsource(mainmodules))
+            with open(os.path.join(tempdir, 'requirements.txt'), 'w') as f:
+                f.write('venvpool>=1\n') # TODO: Use same spec as pyven.
+            for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), venvpool.__file__, '-l', '--', scriptpath, self.projectdir] + paths).splitlines():
+                yield MainModule(eval(line))
 
     def console_scripts(self):
         return [mm.console_script for mm in self.mainmodules()]
