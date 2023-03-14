@@ -183,9 +183,9 @@ class ProjectInfo:
             scriptpath = os.path.join(tempdir, 'mainmodules.py')
             with open(scriptpath, 'w') as f:
                 f.write(getsource(mainmodules))
-            with open(os.path.join(tempdir, 'requirements.txt'), 'w') as f:
-                f.write('venvpool>=1\n') # TODO: Use same spec as pyven.
-            for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), venvpool.__file__, '-l', '--', scriptpath, self.projectdir] + paths).splitlines():
+            with open(os.path.join(tempdir, 'venvpool.py'), 'w') as f:
+                f.write(getsource(venvpool))
+            for line in subprocess.check_output(["python%s" % next(iter(self.config.pyversions)), scriptpath, self.projectdir] + paths).splitlines():
                 yield MainModule(eval(line))
 
     def console_scripts(self):
