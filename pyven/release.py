@@ -134,7 +134,7 @@ def _warmups(info):
                 with NamedTemporaryFile('w', suffix = dotpy, dir = info.projectdir) as script:
                     script.write("from %s import %s\n%s()" % (m, f.split('.')[0], f))
                     script.flush()
-                    venv.run('check_call', installdeps.localreqs, os.path.basename(script.name)[:-len(dotpy)], [], cwd = info.projectdir)
+                    venv.run('check_call', ['.'] + installdeps.localreqs, os.path.basename(script.name)[:-len(dotpy)], [], cwd = info.projectdir)
 
 def _runsetup(info, commands):
     with Pool(next(iter(info.config.pyversions))).readonly(SimpleInstallDeps(allbuildrequires(info))) as venv:
