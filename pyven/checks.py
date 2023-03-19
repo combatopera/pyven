@@ -106,7 +106,7 @@ class EveryVersion:
     def nose(self):
         upstream_devel_packages = list(self.info.config.upstream.devel.packages)
         with InstallDeps(self.info, self.siblings, _localrepo() if self.userepo else None) as installdeps:
-            installdeps.add('nose-cov')
+            installdeps.add('nose-cov', *self.info.config.test.requires)
             for pyversion in self.info.config.pyversions:
                 reportsdir = os.path.join(self.info.projectdir, 'var', str(pyversion))
                 os.makedirs(reportsdir, exist_ok = True)
