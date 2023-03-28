@@ -92,7 +92,23 @@ def setupcommand(info, pyversion, transient, *command):
         with Pool(pyversion).readonlyortransient[transient](SimpleInstallDeps(buildreqs)) as venv:
             setup(venv.programpath('python'))
 
+class VolatileReq:
+
+    @property
+    def namepart(self):
+        return self.info.config.name
+
+    def __init__(self, info):
+        self.info = info
+
+    def acceptversion(self, versionstr):
+        return self.info.devversion() == versionstr
+
 class InstallDeps:
+
+    @property
+    def pypireqs(self):
+        return [VolatileReq(i) for i in self.volatileprojects] + self.fetchreqs
 
     def __init__(self, info, siblings, localrepo):
         self.info = info
@@ -139,14 +155,14 @@ class InstallDeps:
             pipify(i)
         self.localreqs = [i.projectdir for i in editableprojects.values()]
         self.volatileprojects = volatileprojects.values()
-        self.pypireqs = list(Req.published(pypireqs))
+        self.fetchreqs = list(Req.published(pypireqs))
         return self
 
     def add(self, *requires):
-        self.pypireqs.extend(Req.parselines(requires))
+        self.fetchreqs.extend(Req.parselines(requires))
 
     def invoke(self, venv):
-        venv.install([i.projectdir for i in self.volatileprojects] + [r.reqstr for r in self.pypireqs])
+        venv.install([i.projectdir for i in self.volatileprojects] + [r.reqstr for r in self.fetchreqs])
 
     def __exit__(self, *exc_info):
         shutil.rmtree(self.workspace)
