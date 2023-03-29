@@ -19,7 +19,7 @@
 from . import targetremote
 from .checks import EveryVersion
 from .pipify import allbuildrequires, InstallDeps, pipify
-from .projectinfo import ProjectInfo
+from .projectinfo import ProjectInfo, SimpleInstallDeps
 from .sourceinfo import SourceInfo
 from .util import bgcontainer
 from argparse import ArgumentParser
@@ -30,7 +30,7 @@ from lagoon.program import partial, Program
 from pkg_resources import resource_filename
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
-from venvpool import dotpy, initlogging, Pip, Pool, SimpleInstallDeps, TemporaryDirectory
+from venvpool import dotpy, initlogging, Pip, Pool, TemporaryDirectory
 import lagoon, logging, os, re, shutil, sys, sysconfig
 
 log = logging.getLogger(__name__)

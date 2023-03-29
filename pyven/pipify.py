@@ -16,12 +16,12 @@
 # along with pyven.  If not, see <http://www.gnu.org/licenses/>.
 
 'Generate setuptools files for a project.arid project.'
-from .projectinfo import ProjectInfo, Req
+from .projectinfo import ProjectInfo, Req, SimpleInstallDeps
 from .sourceinfo import SourceInfo
 from argparse import ArgumentParser
 from pkg_resources import resource_filename
 from tempfile import mkdtemp
-from venvpool import initlogging, Pool, SimpleInstallDeps
+from venvpool import initlogging, Pool
 import logging, os, shutil, subprocess, sys
 
 log = logging.getLogger(__name__)

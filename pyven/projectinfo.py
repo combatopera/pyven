@@ -23,7 +23,7 @@ from aridity.config import ConfigCtrl
 from aridity.util import openresource
 from inspect import getsource
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
-from venvpool import BaseReq, executablebits, TemporaryDirectory
+from venvpool import BaseReq, executablebits, ParsedRequires, TemporaryDirectory
 import logging, os, re, subprocess, venvpool
 
 log = logging.getLogger(__name__)
@@ -88,6 +88,10 @@ class Req(BaseReq):
     def keyversion(self):
         s, = self.specifierset
         return self.parsed.key, s.version
+
+class SimpleInstallDeps(ParsedRequires):
+
+    parselines = staticmethod(BaseReq.parselines)
 
 class ProjectInfo:
 

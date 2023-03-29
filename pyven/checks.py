@@ -17,7 +17,7 @@
 
 from .files import Files
 from .pipify import InstallDeps
-from .projectinfo import ProjectInfo
+from .projectinfo import ProjectInfo, SimpleInstallDeps
 from .util import bgcontainer, Excludes, pyversiontags, stderr
 from argparse import ArgumentParser
 from aridity.config import ConfigCtrl
@@ -27,7 +27,7 @@ from itertools import chain
 from lagoon import diff
 from setuptools import find_packages
 from tempfile import NamedTemporaryFile
-from venvpool import initlogging, Pool, SimpleInstallDeps
+from venvpool import initlogging, Pool
 import logging, os, shutil, subprocess, sys
 
 log = logging.getLogger(__name__)
