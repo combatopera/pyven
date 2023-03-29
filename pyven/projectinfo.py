@@ -22,8 +22,9 @@ from .util import Path
 from aridity.config import ConfigCtrl
 from aridity.util import openresource
 from inspect import getsource
+from pkg_resources import parse_requirements
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
-from venvpool import BaseReq, executablebits, ParsedRequires, TemporaryDirectory
+from venvpool import executablebits, ParsedRequires, TemporaryDirectory
 import logging, os, re, subprocess, venvpool
 
 log = logging.getLogger(__name__)
@@ -41,19 +42,13 @@ def textcontent(node):
             yield value
     return ''.join(iterparts(node))
 
-class Req(BaseReq):
+class Req:
 
     namematch = re.compile(r'\S+').search
 
-    @property
-    def specifierset(self):
-        return self.parsed.specifier
-
-    def siblingpath(self, workspace):
-        return os.path.join(workspace, self.namepart)
-
-    def isproject(self, info):
-        return os.path.exists(self.siblingpath(info.contextworkspace()))
+    @classmethod
+    def parselines(cls, lines):
+        return [cls(parsed) for parsed in parse_requirements(lines)]
 
     @classmethod
     def published(cls, reqstrs):
@@ -71,6 +66,34 @@ class Req(BaseReq):
                 if e.code != HTTPStatus.NOT_FOUND:
                     raise
                 log.warning("Never published: %s", r.namepart)
+
+    @property
+    def namepart(self):
+        return self.parsed.name
+
+    @property
+    def extras(self):
+        return self.parsed.extras
+
+    @property
+    def reqstr(self):
+        return str(self.parsed)
+
+    @property
+    def specifierset(self):
+        return self.parsed.specifier
+
+    def __init__(self, parsed):
+        self.parsed = parsed
+
+    def acceptversion(self, versionstr):
+        return versionstr in self.parsed
+
+    def siblingpath(self, workspace):
+        return os.path.join(workspace, self.namepart)
+
+    def isproject(self, info):
+        return os.path.exists(self.siblingpath(info.contextworkspace()))
 
     def minstr(self):
         version, = (s.version for s in self.specifierset if s.operator in {'>=', '=='})
@@ -91,7 +114,7 @@ class Req(BaseReq):
 
 class SimpleInstallDeps(ParsedRequires):
 
-    parselines = staticmethod(BaseReq.parselines)
+    parselines = staticmethod(Req.parselines)
 
 class ProjectInfo:
 
