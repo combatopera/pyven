@@ -178,7 +178,7 @@ class ProjectInfo:
             if 404 != e.code:
                 raise
             last = 0
-        return str(last + 1)
+        return str(max(10, last + 1))
 
     def descriptionandurl(self):
         import urllib.error, urllib.request, json, time
