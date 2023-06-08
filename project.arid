@@ -31,7 +31,7 @@ requires +=
     lagoon>=24
     setuptools>=44.1.1
     twine>=1.15.0
-    venvpool>=1
+    venvpool>=10
 pyversions +=
     3
     2
