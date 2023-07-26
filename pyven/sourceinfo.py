@@ -27,7 +27,7 @@ class SourceInfo:
 
         def buildrequires(self):
             if self.path.endswith('.pyx'):
-                yield 'Cython'
+                yield 'Cython<3'
 
         def make_ext(self):
             g = {}
