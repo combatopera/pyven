@@ -116,9 +116,8 @@ class EveryVersion:
                     with bgcontainer('-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
                         container = Container(container)
                         container.inituser()
-                        if upstream_devel_packages:
-                            for command in ['apt-get', 'update'], ['apt-get', 'install', '-y'] + upstream_devel_packages:
-                                container.call(command, check = True, root = True)
+                        for command in ['apt-get', 'update'], ['apt-get', 'install', '-y', 'sudo'] + upstream_devel_packages:
+                            container.call(command, check = True, root = True)
                         installdeps.invoke(container)
                         cpath = lambda p: os.path.relpath(p, self.info.projectdir).replace(os.sep, '/')
                         status = container.call([
@@ -189,7 +188,7 @@ class Container:
 
     def call(self, args, check = False, root = False):
         from lagoon import docker
-        return docker('exec', '-w', self.workdir, *([] if root else ['-u', "%s:%s" % (self.uid, self.gid)]) + [self.container] + args, stdout = None, check = check)
+        return docker('exec', '-w', self.workdir, self.container, *([] if root else ['sudo', '-u', 'pyvenuser']) + args, stdout = None, check = check)
 
 def main():
     initlogging()
