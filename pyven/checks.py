@@ -113,7 +113,7 @@ class EveryVersion:
                 xmlpath = os.path.join(reportsdir, 'nosetests.xml')
                 if self.docker:
                     coveragepath = os.path.join(self.info.projectdir, '.coverage')
-                    with bgcontainer('-v', "{0}:{0}".format('/var/run/docker.sock'), '-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
+                    with bgcontainer('-v', "{0}:{0}".format('/var/run/docker.sock'), '--network', 'host', '-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
                         container = Container(container)
                         container.inituser()
                         for command in ['apt-get', 'update'], ['apt-get', 'install', '-y', 'sudo'] + upstream_devel_packages:
