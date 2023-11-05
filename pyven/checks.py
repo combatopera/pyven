@@ -113,7 +113,7 @@ class EveryVersion:
                 xmlpath = os.path.join(reportsdir, 'nosetests.xml')
                 if self.docker:
                     coveragepath = os.path.join(self.info.projectdir, '.coverage')
-                    with bgcontainer('-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
+                    with bgcontainer('-v', "{0}:{0}".format('/var/run/docker.sock'), '-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
                         container = Container(container)
                         container.inituser()
                         for command in ['apt-get', 'update'], ['apt-get', 'install', '-y', 'sudo'] + upstream_devel_packages:
@@ -178,8 +178,9 @@ class Container:
 
     def inituser(self):
         from lagoon import docker
+        docker('exec', self.container, 'groupadd', '-g', os.stat('/var/run/docker.sock').st_gid, 'docker', stdout = None)
         docker('exec', self.container, 'groupadd', '-g', self.gid, 'pyvengroup', stdout = None)
-        docker('exec', self.container, 'useradd', '-g', self.gid, '-u', self.uid, '-m', 'pyvenuser', stdout = None)
+        docker('exec', self.container, 'useradd', '-g', self.gid, '-G', 'docker', '-u', self.uid, '-m', 'pyvenuser', stdout = None)
 
     def install(self, args):
         from lagoon import docker
