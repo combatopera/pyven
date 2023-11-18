@@ -37,6 +37,7 @@ log = logging.getLogger(__name__)
 distrelpath = 'dist'
 
 @enum(
+    ['2023-11-13-f6b0c51', 'manylinux_2_28_x86_64', False],
     ['2022-12-26-0d38463', 'manylinux_2_24_x86_64', False],
     ['2022-12-26-0d38463', 'manylinux_2_24_i686', True],
     ['2020-08-29-f97fd86', 'manylinux2014_x86_64', False, True],
