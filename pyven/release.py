@@ -54,7 +54,7 @@ class Image:
     def __init__(self, imagetag, plat, linux32, keepplainwhl = False):
         self.imagetag = imagetag
         self.plat = plat
-        self.entrypoint = ['linux32'] if linux32 else []
+        self.linux32 = linux32
         self.prune = [] if keepplainwhl else ['--prune']
 
     def makewheels(self, info): # TODO: This code would benefit from modern syntax.
@@ -64,11 +64,12 @@ class Image:
         log.info("Make wheels for platform: %s", self.plat)
         scripts = list(info.config.devel.scripts)
         packages = list(chain(info.config.devel.packages, ['sudo'] if scripts else []))
-        compatibilities = list(info.config.wheel.compatibilities.all)
+        compatibilities = list(getattr(info.config.wheel.compatibilities, 'i686' if self.linux32 else 'x86-64').all)
         # TODO: Copy not mount so we can run containers in parallel.
         with bgcontainer('-v', "%s:/io" % info.projectdir, "%s%s:%s" % (self.prefix, self.plat, self.imagetag)) as container:
             def run(execargs, command):
-                docker_print(*chain(['exec'], execargs, [container], self.entrypoint, command))
+                entrypoint = ['linux32'] if self.linux32 else []
+                docker_print(*chain(['exec'], execargs, [container], entrypoint, command))
             if packages:
                 try:
                     run([], chain(['yum', 'install', '-y'], packages))
