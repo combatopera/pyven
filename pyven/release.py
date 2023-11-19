@@ -47,7 +47,7 @@ def _images():
         i686 = Arch('i686', 'linux32'),
         x86_64 = Arch('x86-64', None),
     )
-    archmatch = re.compile(f"_({'|'.join(map(re.escape, archlookup))})$").search
+    archmatch = re.compile("_(%s)$" % '|'.join(map(re.escape, archlookup))).search
     images = {
         'manylinux_2_28_x86_64': '2023-11-13-f6b0c51',
         'manylinux_2_24_x86_64': '2022-12-26-0d38463',
