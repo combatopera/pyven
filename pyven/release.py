@@ -49,15 +49,20 @@ def _images():
     )
     archmatch = re.compile(f"_({'|'.join(map(re.escape, archlookup))})$").search
     images = {
-        'manylinux_2_28_x86_64': ['2023-11-13-f6b0c51', False],
-        'manylinux_2_24_x86_64': ['2022-12-26-0d38463', False],
-        'manylinux_2_24_i686': ['2022-12-26-0d38463', False],
-        'manylinux2014_x86_64': ['2020-08-29-f97fd86', True],
-        'manylinux2014_i686': ['2020-08-29-f97fd86', True],
+        'manylinux_2_28_x86_64': '2023-11-13-f6b0c51',
+        'manylinux_2_24_x86_64': '2022-12-26-0d38463',
+        'manylinux_2_24_i686': '2022-12-26-0d38463',
+        'manylinux2014_x86_64': '2020-08-29-f97fd86',
+        'manylinux2014_i686': '2020-08-29-f97fd86',
     }
-    for plat, (imagetag, keepplainwhl) in images.items():
-        arch = archlookup[archmatch(plat).group(1)]
-        yield Image(imagetag, plat, arch, keepplainwhl)
+    plattoarch = {}
+    archtolastplat = {}
+    for plat in images:
+        plattoarch[plat] = arch = archlookup[archmatch(plat).group(1)]
+        archtolastplat[arch] = plat
+    for plat, imagetag in images.items():
+        arch = plattoarch[plat]
+        yield Image(imagetag, plat, arch, plat == archtolastplat[arch])
 
 class Image:
 
