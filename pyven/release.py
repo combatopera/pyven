@@ -35,9 +35,19 @@ import lagoon, logging, os, re, shutil, sys, sysconfig
 
 log = logging.getLogger(__name__)
 distrelpath = 'dist'
-linux32lookup = dict(i686 = True, x86_64 = False)
+
+class Arch:
+
+    def __init__(self, configkey, entrypointornone):
+        self.configkey = configkey
+        self.entrypoint = [] if entrypointornone is None else [entrypointornone]
 
 def _images():
+    archlookup = dict(
+        i686 = Arch('i686', 'linux32'),
+        x86_64 = Arch('x86-64', None),
+    )
+    archmatch = re.compile(f"_({'|'.join(map(re.escape, archlookup))})$").search
     images = {
         'manylinux_2_28_x86_64': ['2023-11-13-f6b0c51', False],
         'manylinux_2_24_x86_64': ['2022-12-26-0d38463', False],
@@ -46,7 +56,8 @@ def _images():
         'manylinux2014_i686': ['2020-08-29-f97fd86', True],
     }
     for plat, (imagetag, keepplainwhl) in images.items():
-        yield Image(imagetag, plat, keepplainwhl)
+        arch = archlookup[archmatch(plat).group(1)]
+        yield Image(imagetag, plat, arch, keepplainwhl)
 
 class Image:
 
@@ -57,11 +68,11 @@ class Image:
         impl = "cp%s" % sysconfig.get_config_var('py_version_nodot')
         return "/opt/python/%s-%s%s/bin/python" % (impl, impl, sys.abiflags)
 
-    def __init__(self, imagetag, plat, keepplainwhl):
-        self.linux32 = linux32lookup[re.search('_(i686|x86_64)$', plat).group(1)]
-        self.prune = [] if keepplainwhl else ['--prune']
+    def __init__(self, imagetag, plat, arch, keepplainwhl):
         self.imagetag = imagetag
         self.plat = plat
+        self.arch = arch
+        self.prune = [] if keepplainwhl else ['--prune']
 
     def makewheels(self, info): # TODO: This code would benefit from modern syntax.
         from lagoon import docker
@@ -70,12 +81,11 @@ class Image:
         log.info("Make wheels for platform: %s", self.plat)
         scripts = list(info.config.devel.scripts)
         packages = list(chain(info.config.devel.packages, ['sudo'] if scripts else []))
-        compatibilities = list(getattr(info.config.wheel.compatibilities, 'i686' if self.linux32 else 'x86-64').all)
+        compatibilities = list(getattr(info.config.wheel.compatibilities, self.arch.configkey).all)
         # TODO: Copy not mount so we can run containers in parallel.
         with bgcontainer('-v', "%s:/io" % info.projectdir, "%s%s:%s" % (self.prefix, self.plat, self.imagetag)) as container:
             def run(execargs, command):
-                entrypoint = ['linux32'] if self.linux32 else []
-                docker_print(*chain(['exec'], execargs, [container], entrypoint, command))
+                docker_print(*chain(['exec'], execargs, [container], self.arch.entrypoint, command))
             if packages:
                 try:
                     run([], chain(['yum', 'install', '-y'], packages))
