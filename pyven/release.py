@@ -24,7 +24,7 @@ from .sourceinfo import SourceInfo
 from .util import bgcontainer
 from argparse import ArgumentParser
 from aridity.config import ConfigCtrl
-from diapyr.util import enum, singleton
+from diapyr.util import singleton
 from itertools import chain
 from lagoon.program import partial, Program
 from pkg_resources import resource_filename
@@ -37,13 +37,17 @@ log = logging.getLogger(__name__)
 distrelpath = 'dist'
 linux32lookup = dict(i686 = True, x86_64 = False)
 
-@enum(
-    ['2023-11-13-f6b0c51', 'manylinux_2_28_x86_64'],
-    ['2022-12-26-0d38463', 'manylinux_2_24_x86_64'],
-    ['2022-12-26-0d38463', 'manylinux_2_24_i686'],
-    ['2020-08-29-f97fd86', 'manylinux2014_x86_64', True],
-    ['2020-08-29-f97fd86', 'manylinux2014_i686', True],
-)
+def _images():
+    images = {
+        'manylinux_2_28_x86_64': ['2023-11-13-f6b0c51', False],
+        'manylinux_2_24_x86_64': ['2022-12-26-0d38463', False],
+        'manylinux_2_24_i686': ['2022-12-26-0d38463', False],
+        'manylinux2014_x86_64': ['2020-08-29-f97fd86', True],
+        'manylinux2014_i686': ['2020-08-29-f97fd86', True],
+    }
+    for plat, (imagetag, keepplainwhl) in images.items():
+        yield Image(imagetag, plat, keepplainwhl)
+
 class Image:
 
     prefix = 'quay.io/pypa/'
@@ -53,7 +57,7 @@ class Image:
         impl = "cp%s" % sysconfig.get_config_var('py_version_nodot')
         return "/opt/python/%s-%s%s/bin/python" % (impl, impl, sys.abiflags)
 
-    def __init__(self, imagetag, plat, keepplainwhl = False):
+    def __init__(self, imagetag, plat, keepplainwhl):
         self.linux32 = linux32lookup[re.search('_(i686|x86_64)$', plat).group(1)]
         self.prune = [] if keepplainwhl else ['--prune']
         self.imagetag = imagetag
@@ -161,7 +165,7 @@ def release(config, srcgit, info):
     shutil.rmtree(os.path.join(info.projectdir, '.git'))
     setupcommands = []
     if SourceInfo(info.projectdir).extpaths:
-        for image in Image.enum:
+        for image in _images():
             image.makewheels(info)
     else:
         setupcommands.append('bdist_wheel')
