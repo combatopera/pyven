@@ -86,7 +86,6 @@ class Image:
         log.info("Make wheels for platform: %s", self.plat)
         scripts = list(info.config.devel.scripts)
         packages = list(chain(info.config.devel.packages, ['sudo'] if scripts else []))
-        compatibilities = list(getattr(info.config.wheel.compatibilities, self.arch.configkey).all)
         # TODO: Copy not mount so we can run containers in parallel.
         with bgcontainer('-v', "%s:/io" % info.projectdir, "%s%s:%s" % (self.prefix, self.plat, self.imagetag)) as container:
             def run(execargs, command):
@@ -105,7 +104,7 @@ class Image:
             docker_print.cp(resource_filename(__name__, 'patchpolicy.py'), "%s:/patchpolicy.py" % container)
             run([], [self.pythonexe, '/patchpolicy.py'])
             docker_print.cp(resource_filename(__name__, 'bdist.py'), "%s:/bdist.py" % container)
-            run(['-u', "%s:%s" % (os.geteuid(), os.getegid()), '-w', '/io'], chain([self.pythonexe, '/bdist.py', '--plat', self.plat], self.prune, compatibilities))
+            run(['-u', "%s:%s" % (os.geteuid(), os.getegid()), '-w', '/io'], chain([self.pythonexe, '/bdist.py', '--plat', self.plat], self.prune, info.config.pyversions))
 
 def main():
     initlogging()

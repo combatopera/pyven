@@ -16,11 +16,11 @@
 # along with pyven.  If not, see <http://www.gnu.org/licenses/>.
 
 from argparse import ArgumentParser
+from glob import iglob
 from tempfile import mkdtemp
 import logging, os, shutil, subprocess
 
 log = logging.getLogger(__name__)
-pythonroot = '/opt/python'
 distdir = 'dist'
 
 def main():
@@ -28,17 +28,17 @@ def main():
     parser = ArgumentParser()
     parser.add_argument('--plat', required = True)
     parser.add_argument('--prune', action = 'store_true')
-    parser.add_argument('compatibilities', nargs = '+')
+    parser.add_argument('pyversions', nargs = '+')
     args = parser.parse_args()
     holder = mkdtemp()
     try:
-        for compatibility in args.compatibilities:
-            pip = os.path.join(pythonroot, compatibility, 'bin', 'pip')
-            if not os.path.exists(pip):
-                log.warning("Image does not support implementation-ABI: %s", compatibility)
+        for pip in sorted(iglob("/opt/python/cp[%s]*/bin/pip" % ''.join(args.pyversions))):
+            log.info("Make wheel(s) for implementation-ABI: %s", pip)
+            try:
+                subprocess.check_call([pip, '--no-cache-dir', 'wheel', '--no-deps', '-w', holder, '.'])
+            except subprocess.CalledProcessError:
+                log.warning('Skip implementation-ABI:', exc_info = True)
                 continue
-            log.info("Make wheel(s) for implementation-ABI: %s", compatibility)
-            subprocess.check_call([pip, '--no-cache-dir', 'wheel', '--no-deps', '-w', holder, '.'])
             wheelpath, = (os.path.join(holder, n) for n in os.listdir(holder))
             subprocess.check_call(['auditwheel', 'repair', '--plat', args.plat, '-w', distdir, wheelpath])
             if not args.prune:

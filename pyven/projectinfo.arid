@@ -30,27 +30,6 @@ licheck
 flakes exclude globs := $list()
 pypi participant = true
 github participant = $¬$(proprietary)
-wheel compatibilities
-    * all = $flat$map($(pyversions) $$())
-    i686
-        2 +=
-            cp27-cp27m
-            cp27-cp27mu
-        3 +=
-            cp36-cp36m
-            cp37-cp37m
-            cp38-cp38
-    x86-64
-        2 +=
-            cp27-cp27m
-            cp27-cp27mu
-        3 +=
-            cp36-cp36m
-            cp37-cp37m
-            cp38-cp38
-            cp39-cp39
-            cp310-cp310
-            cp311-cp311
 devel
     packages := $list()
     scripts := $list()
