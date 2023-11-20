@@ -55,14 +55,8 @@ def _images():
         'manylinux2014_x86_64': '2020-08-29-f97fd86',
         'manylinux2014_i686': '2020-08-29-f97fd86',
     }
-    plattoarch = {}
-    archtolastplat = {}
-    for plat in images:
-        plattoarch[plat] = arch = archlookup[archmatch(plat).group(1)]
-        archtolastplat[arch] = plat
     for plat, imagetag in images.items():
-        arch = plattoarch[plat]
-        yield Image(imagetag, plat, arch, plat == archtolastplat[arch])
+        yield Image(imagetag, plat, archlookup[archmatch(plat).group(1)])
 
 class Image:
 
@@ -73,11 +67,10 @@ class Image:
         impl = "cp%s" % sysconfig.get_config_var('py_version_nodot')
         return "/opt/python/%s-%s%s/bin/python" % (impl, impl, sys.abiflags)
 
-    def __init__(self, imagetag, plat, arch, keepplainwhl):
+    def __init__(self, imagetag, plat, arch):
         self.imagetag = imagetag
         self.plat = plat
         self.arch = arch
-        self.prune = [] if keepplainwhl else ['--prune']
 
     def makewheels(self, info): # TODO: This code would benefit from modern syntax.
         from lagoon import docker
@@ -104,7 +97,7 @@ class Image:
             docker_print.cp(resource_filename(__name__, 'patchpolicy.py'), "%s:/patchpolicy.py" % container)
             run([], [self.pythonexe, '/patchpolicy.py'])
             docker_print.cp(resource_filename(__name__, 'bdist.py'), "%s:/bdist.py" % container)
-            run(['-u', "%s:%s" % (os.geteuid(), os.getegid()), '-w', '/io'], chain([self.pythonexe, '/bdist.py', '--plat', self.plat], self.prune, info.config.pyversions))
+            run(['-u', "%s:%s" % (os.geteuid(), os.getegid()), '-w', '/io'], chain([self.pythonexe, '/bdist.py', '--plat', self.plat], info.config.pyversions))
 
 def main():
     initlogging()
