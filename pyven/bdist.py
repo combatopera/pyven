@@ -37,7 +37,7 @@ def main():
             try:
                 subprocess.check_call([pip, '--no-cache-dir', 'wheel', '--no-deps', '-w', holder, '.'])
             except subprocess.CalledProcessError:
-                log.warning('Skip implementation-ABI:', exc_info = True)
+                log.warning('Skip compatibility:', exc_info = True)
                 continue
             wheelpath, = (os.path.join(holder, n) for n in os.listdir(holder))
             subprocess.check_call(['auditwheel', 'repair', '--plat', args.plat, '-w', distdir, wheelpath])
