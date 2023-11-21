@@ -43,7 +43,7 @@ def main():
             subprocess.check_call(['auditwheel', 'repair', '--plat', args.plat, '-w', distdir, wheelpath])
             plaintarget = os.path.join(distdir, os.path.basename(wheelpath))
             if os.path.exists(plaintarget):
-                log.info("Replace: %s", plaintarget)
+                log.info("Replace plain wheel: %s", plaintarget)
             shutil.copy2(wheelpath, distdir)
             os.remove(wheelpath)
     finally:
