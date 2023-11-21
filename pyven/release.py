@@ -38,14 +38,13 @@ distrelpath = 'dist'
 
 class Arch:
 
-    def __init__(self, configkey, entrypointornone):
-        self.configkey = configkey
+    def __init__(self, entrypointornone):
         self.entrypoint = [] if entrypointornone is None else [entrypointornone]
 
 def _images():
     archlookup = dict(
-        i686 = Arch('i686', 'linux32'),
-        x86_64 = Arch('x86-64', None),
+        i686 = Arch('linux32'),
+        x86_64 = Arch(None),
     )
     archmatch = re.compile("_(%s)$" % '|'.join(map(re.escape, archlookup))).search
     images = {
