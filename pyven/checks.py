@@ -18,13 +18,14 @@
 from .files import Files
 from .pipify import InstallDeps
 from .projectinfo import ProjectInfo, SimpleInstallDeps
-from .util import bgcontainer, Excludes, pyversiontags, stderr
+from .util import bgcontainer, Excludes, initapt, pyversiontags, stderr
 from argparse import ArgumentParser
 from aridity.config import ConfigCtrl
 from aridity.util import NoSuchPathException, openresource
 from diapyr.util import singleton
 from itertools import chain
 from lagoon import diff
+from lagoon.program import partial
 from setuptools import find_packages
 from tempfile import NamedTemporaryFile
 from venvpool import initlogging, Pool
@@ -116,6 +117,7 @@ class EveryVersion:
                     with bgcontainer('-v', "{0}:{0}".format('/var/run/docker.sock'), '--network', 'host', '-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
                         container = Container(container)
                         container.inituser()
+                        container.initapt()
                         for command in ['apt-get', 'update'], ['apt-get', 'install', '-y', 'sudo'] + upstream_devel_packages:
                             container.call(command, check = True, root = True)
                         installdeps.invoke(container)
@@ -181,6 +183,10 @@ class Container:
         docker('exec', self.container, 'groupadd', '-g', os.stat('/var/run/docker.sock').st_gid, 'docker', stdout = None)
         docker('exec', self.container, 'groupadd', '-g', self.gid, 'pyvengroup', stdout = None)
         docker('exec', self.container, 'useradd', '-g', self.gid, '-G', 'docker', '-u', self.uid, '-m', 'pyvenuser', stdout = None)
+
+    def initapt(self):
+        from lagoon import docker
+        initapt(docker[partial]('exec', self.container, stdout = None))
 
     def install(self, args):
         from lagoon import docker

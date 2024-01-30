@@ -93,3 +93,8 @@ def bgcontainer(*dockerrunargs):
         yield container
     finally:
         docker.rm._f(container, stdout = None)
+
+def initapt(dockerexec):
+    dockerexec('mkdir', '-pv', '/etc/apt/keyrings')
+    dockerexec('curl', '-fsSL', 'https://download.docker.com/linux/debian/gpg', '-o', '/etc/apt/keyrings/docker.asc')
+    dockerexec('sh', '-c', 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list')

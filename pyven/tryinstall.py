@@ -19,7 +19,7 @@
 from .checks import EveryVersion
 from .pipify import pipify
 from .projectinfo import ProjectInfo
-from .util import bgcontainer, pyversiontags
+from .util import bgcontainer, initapt, pyversiontags
 from lagoon import git
 from lagoon.program import partial
 from urllib.request import urlopen
@@ -46,6 +46,7 @@ def main():
         with bgcontainer("python:%s" % pyversion) as container:
             containerexec = docker[partial]('exec', container, stdout = None)
             if upstream_devel_packages:
+                initapt(containerexec)
                 containerexec('apt-get', 'update')
                 containerexec('apt-get', 'install', '-y', *upstream_devel_packages)
             containerexec('pip', 'install', req)
