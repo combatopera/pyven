@@ -117,7 +117,8 @@ class EveryVersion:
                     with bgcontainer('-v', "{0}:{0}".format('/var/run/docker.sock'), '--network', 'host', '-v', "%s:%s" % (os.path.abspath(self.info.projectdir), Container.workdir), "python:%s" % pyversiontags[pyversion][0]) as container:
                         container = Container(container)
                         container.inituser()
-                        container.initapt()
+                        if upstream_devel_packages:
+                            container.initapt()
                         for command in ['apt-get', 'update'], ['apt-get', 'install', '-y', 'sudo'] + upstream_devel_packages:
                             container.call(command, check = True, root = True)
                         installdeps.invoke(container)
