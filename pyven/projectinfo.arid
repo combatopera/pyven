@@ -35,4 +35,4 @@ devel
     scripts := $list()
 warmups := $list()
 upstream devel packages := $list()
-$.(test) requires := $list()
+test requires := $list()
