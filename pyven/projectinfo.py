@@ -17,7 +17,7 @@
 
 from . import mainmodules
 from .files import Files
-from .setuproot import setuptoolsinfo
+from .setuproot import getsetupkwargs
 from .util import Path
 from aridity.config import ConfigCtrl
 from aridity.util import openresource
@@ -227,3 +227,16 @@ class MainModule:
     def __init__(self, d):
         for k, v in d.items():
             setattr(self, k, v)
+
+def setuptoolsinfo(setuppath):
+    with openresource(__name__, 'setuptools.arid') as f:
+        info = ProjectInfo(os.path.dirname(setuppath), f)
+    setupkwargs = getsetupkwargs(setuppath, ['name', 'install_requires', 'entry_points'])
+    if 'name' in setupkwargs:
+        info.config.name = setupkwargs['name']
+    for r in setupkwargs.get('install_requires', []):
+        (-info.config).printf("requires += %s", r)
+    console_scripts = setupkwargs.get('entry_points', {}).get('console_scripts')
+    info.console_scripts = lambda: console_scripts
+    info.config.executable = bool(console_scripts)
+    return info
