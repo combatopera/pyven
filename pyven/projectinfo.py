@@ -17,13 +17,13 @@
 
 from . import mainmodules
 from .files import Files
-from .setuproot import getsetupkwargs
 from .util import Path
 from aridity.config import ConfigCtrl
 from aridity.util import openresource
 from inspect import getsource
 from pkg_resources import parse_requirements
 from pkg_resources.extern.packaging.markers import UndefinedEnvironmentName
+from setuphacks import getsetupkwargs
 from venvpool import executablebits, ParsedRequires, TemporaryDirectory
 import logging, os, re, subprocess, venvpool
 
