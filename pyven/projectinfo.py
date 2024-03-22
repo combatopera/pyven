@@ -139,7 +139,7 @@ class ProjectInfo:
             return setuptoolsinfo(setuppath)
         log.info('Use uninstallable mode.')
         projectdir = os.path.dirname(Path.seek(realdir, '.git'))
-        with openresource(__name__, 'setuproot/setuptools.arid') as f:
+        with openresource(__name__, 'setuptools.arid') as f:
             info = cls(projectdir, f)
         info.config.name = os.path.basename(os.path.abspath(projectdir))
         return info

@@ -32,7 +32,7 @@ def getsetupkwargs(setuppath, fields):
 
 def setuptoolsinfo(setuppath):
     from ..projectinfo import ProjectInfo
-    with openresource(__name__, 'setuptools.arid') as f:
+    with openresource(__name__, '../setuptools.arid') as f:
         info = ProjectInfo(os.path.dirname(setuppath), f)
     setupkwargs = getsetupkwargs(setuppath, ['name', 'install_requires', 'entry_points'])
     if 'name' in setupkwargs:
